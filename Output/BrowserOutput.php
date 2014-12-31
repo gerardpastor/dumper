@@ -11,7 +11,7 @@
 
 namespace Deg\Dumper\Output;
 
-use Monolog\Formatter\FormatterInterface;
+use Deg\Dumper\Formatter\FormatterInterface;
 use Deg\Dumper\Formatter\HtmlFormatter;
 
 /**

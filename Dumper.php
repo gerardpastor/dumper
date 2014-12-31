@@ -368,6 +368,7 @@ class Dumper
         self::$instance = new self($varParser, $backtraceParser, $backtraceFactory);
 
         self::$instance->addOutput('browser', new Output\BrowserOutput());
+        self::$instance->addOutput('console', new Output\ConsoleOutput());
         self::$instance->setDefaultOutput($context);
 
 
