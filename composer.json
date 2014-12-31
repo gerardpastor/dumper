@@ -2,9 +2,8 @@
     "name":         "gerardpastor/dumper",
     "description":  "A simple PHP var dumper",
     "keywords":     ["php", "dump", "debug"],
-    "type":         "library",
+    "homepage":     "https://github.com/gerardpastor/dumper",
     "license":      "MIT",
-    "homepage":     "http://www.gerard-pastor.com",
     "authors":      [
         {
             "name":     "Gerard Pastor",
