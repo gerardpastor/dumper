@@ -11,6 +11,7 @@
 
 namespace Deg\Dumper\Output;
 
+use Monolog\Formatter\FormatterInterface;
 use Deg\Dumper\Formatter\HtmlFormatter;
 
 /**
@@ -25,7 +26,7 @@ class BrowserOutput extends Output
      *
      * @param FormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      */
-    public function __construct(\Deg\Dumper\Formatter\FormatterInterface $formatter = null)
+    public function __construct(FormatterInterface $formatter = null)
     {
         $formatter = $formatter ? : new HtmlFormatter();
 
