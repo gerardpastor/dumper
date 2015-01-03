@@ -17,11 +17,8 @@ use Deg\Dumper\Dumper;
 Dumper::enable(Dumper::BROWSER);
 ```
 
-The first parameter determines what output to use.
-
-
-Outputs
--------
+The first parameter determines what output to use. This can be a predefined
+string or an instance of `OutputInterface`.
 
 By default, Dumper includes 3 outputs: dummy, browser and console.
 
@@ -98,7 +95,8 @@ edumpBacktrace();
 Raw var_dump
 -----------------
 
-Aditionally, Dumper provides `rawDump` funtion that does a native `var_dump` inside a `<pre>` tag.
+Aditionally, Dumper provides `rawDump` funtion that does a native `var_dump`
+inside a `<pre>` tag.
 
 ```php
 rawDump('foo', 'var');
@@ -113,7 +111,9 @@ Accessing Dumper Instance
 -------------------------
 
 To configure Dumper you must acces to its instance.
-You can access dumper instance when call `enable()` or by calling `getInstance()` when Dumper is already enabled.
+
+You can access dumper instance when call `enable()` or by calling
+`getInstance()` when Dumper is already enabled.
 
 ```php
 use Deg\Dumper\Dumper;
@@ -140,7 +140,8 @@ $dumper->getVarParser()->setMaxDeep(3);
 dump($arrayOrObject);
 ```
 
-You can override this value in any call to `dump` or `dumpVars` as the second argument:
+You can override this value in any call to `dump` or `dumpVars` as the second
+argument:
 
 ```php
 // Dumps at 2 levels
@@ -150,7 +151,8 @@ dump($arrayOrObject, 2);
 Limit the number of stack frames in backtrace dumping
 -----------------------------------------------------
 
-By default, Dumper dumps all stack frames in backtrace. You can limit this number globally by passing to the `BacktraceFactory`:
+By default, Dumper dumps all stack frames in backtrace. You can limit this
+number globally by passing to the `BacktraceFactory`:
 
 ```php
 use Deg\Dumper\Dumper;
@@ -162,7 +164,8 @@ $dumper->getBacktraceFactory()->setMaxLimit(3);
 dumpBacktrace();
 ```
 
-You can override this value in any call to `dumpBacktrace` as the first argument:
+You can override this value in any call to `dumpBacktrace` as the first
+argument:
 
 ```php
 // Dumps 2 stack frames
@@ -172,7 +175,8 @@ dumpBacktrace(2);
 Add excludes to backtrace
 -------------------------
 
-Dumper exculdes all namespaces and directories from Dumper, but you can add your own by passing to the `BacktraceFactory`:
+Dumper exculdes all namespaces and directories from Dumper, but you can add your
+own by passing to the `BacktraceFactory`:
 
 ```php
 use Deg\Dumper\Dumper;
@@ -188,7 +192,9 @@ $dumper->getBacktraceFactory()->addExcule(__DIRECTORY__ . '/foo/var');
 Disabling global functions
 ==========================
 
-You can disable the definition of Dumper as a global functions by passing `false` as the second argument when calling `enable()`.
+You can disable the definition of Dumper as a global functions by passing
+`false` as the second argument when calling `enable()`.
+
 Then, you can still access dumper functions by calling directly on a dumper instance:
 
 ```php
@@ -199,7 +205,8 @@ $dumper = Dumper::enable(Dumper::BROWSER, false);
 $dumper->dump('foo');
 ```
 
-You can then enable this global functions at any time by calling `defineGlobalFunctions()`:
+You can then enable this global functions at any time by calling
+`defineGlobalFunctions()`:
 
 ```php
 use Deg\Dumper\Dumper;
@@ -214,7 +221,9 @@ Var Tokenizers
 ==============
 
 Dumper uses tokenizers to convert any variable into a string.
-A tokenizer receives a variable and returns a `TokenStream` (that is a collection of `Token`)
+
+A tokenizer receives a variable and returns a `TokenStream` (that is a
+collection of `Token`)
 
 Dumper provides tokenizer to parse the most generic variable types:
 - _ObjectTokenizer_: Parses an object
@@ -223,14 +232,18 @@ Dumper provides tokenizer to parse the most generic variable types:
 - _GenericTokenizer_: Parses any variable (in a very simple way)
 
 Tokenizer has an `accept($var)` and a `getConfidence()` methods.
-The parser will use the tokenizer with bigger confidence from those that accepted the given variable.
+
+The parser will use the tokenizer with bigger confidence from those that
+accepted the given variable.
 
 
 Custom Tokenizers
 -----------------
 
 You can add more specific or sophisticated parsing by adding custom tokenizers.
-To do that, you must create a class that implements `TokenizerInterface` and pass to the `VarParser`:
+
+To do that, you must create a class that implements `TokenizerInterface` and
+pass to the `VarParser`:
 
 ```php
 namespace Foo\Var;
@@ -286,6 +299,112 @@ $dumper->getVarParser()->addTokenizer(new Foo\Var\MyCustomTokenizer());
 Take a look at provided tokenizers for more specific examples.
 
 
+Outputs
+=======
+
+Dumper can use diferent outputs to show variables to user.
+The provided Outputs are:
+
+- _BrowserOutput_: Prints parsed result to the browser (like `var_dump`)
+- _ConsoleOutput_: Prints parsed result to de system console (`php://stdout`, `php://output`)
+- _NullOutput_: Prints nothing. Can be used to prevent dump any variable in a production environment.
+
+Using custom Outputs
+--------------------
+
+You can provide your own output by extending `Output` class:
+
+```php
+namespace Foo\Var;
+
+class MyCustomOutput extends Output
+{
+    public function __construct(FormatterInterface $formatter = null)
+    {
+        $formatter = $formatter ? : new HtmlFormatter();
+
+        parent::__construct($formatter);
+    }
+
+    protected function doWrite($message)
+    {
+        print $message;
+    }
+}
+```
+
+And then use it:
+
+```php
+use Deg\Dumper\Dumper;
+
+$output = new Foo\Var\MyCustomOutput;
+
+$dumper = Dumper::enable($output);
+// or
+
+$dumper->setOutput($output);
+```
+
+Take a look at provided outputs for more specific examples.
+
+
+
+Formatters
+==========
+
+An Output use a Formatter to format the response.
+Te provided Outputs are:
+- _HtmlFormatter_: Formats result to HTML code.
+- _ConsoleFormatter_: Formats result to console code.
+- _PlainFormatter_: Only format chars like new lines or indentions.
+
+
+Using custom Formatters
+--------------------
+
+You can provide your own formatter by implementing `FormatterInterface`
+interface:
+
+```php
+namespace Foo\Var;
+
+class MyCustomFormatter implements FormatterInterface
+{
+    public function formatStream(TokenStream $stream)
+    {
+        $buffer = '';
+
+        while ($stream->hasNext()) {
+            $token = $stream->getNext();
+            $buffer .= $this->formatToken($token);
+        }
+
+        return $buffer;
+    }
+
+    public function formatToken(Token $token)
+    {
+        return $token->getDescription() ?: $token->getValue();
+    }
+}
+```
+
+And then use it:
+
+```php
+use Deg\Dumper\Dumper;
+
+$formatter = new Foo\Var\MyCustomFormatter;
+
+$dumper = Dumper::enable(Dumper::BROWSER);
+$dumper->getOutput()->setFormatter($formatter);
+
+```
+
+Take a look at provided formatters for more specific examples.
+
+
 Using Dumper as Object
 ======================
 
@@ -311,7 +430,8 @@ $dumper = new Dumper($varParser, $backtraceParser, $backtraceFactory, $output);
 $dumper->dump('foo');
 ```
 
-If you want the global functions uses your own instance, call `setInstance()` on `Dumper`:
+If you want the global functions uses your own instance, call `setInstance()` on
+`Dumper`:
 
 
 ```php
