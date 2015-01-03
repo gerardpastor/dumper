@@ -35,7 +35,7 @@ By default, Dumper defines 3 dumper functions:
 
 
 ```php
-// Dumps each var in $vars (accepts
+// Dumps each var in $vars
 // dumpVars(array $vars, $deep = null)
 
 $vars = array(
