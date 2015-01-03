@@ -29,6 +29,10 @@ use Deg\Dumper\Output;
  */
 class Dumper
 {
+    const OUTPUT_BROWSER = 'browser';
+    const OUTPUT_CONSOLE = 'console';
+    const OUTPUT_DUMMY = 'dummy';
+
     /**
      *
      * @var VarParser
@@ -379,12 +383,12 @@ class Dumper
         $backtraceFactory->addExcule(__NAMESPACE__);
 
         if (!$output instanceof OutputInterface) {
-            switch ($output) {
-                case 'browser':
+            switch (strtolower($output)) {
+                case static::OUTPUT_BROWSER:
                     $output = new Output\BrowserOutput();
                     break;
 
-                case 'console':
+                case static::OUTPUT_CONSOLE:
                     $output = new Output\ConsoleOutput();
                     break;
 
