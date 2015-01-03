@@ -31,7 +31,7 @@ Functions
 Dumping vars
 ------------
 
-By default, Dumper defines 4 dumper functions:
+By default, Dumper defines 3 dumper functions:
 
 
 ```php
