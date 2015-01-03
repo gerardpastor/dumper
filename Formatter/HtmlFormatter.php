@@ -25,7 +25,7 @@ class HtmlFormatter extends PlainFormatter
     const TEMPLATE_CALLER = '<code style="color: #999; display: block;  padding-bottom: 10px; font-size: 12px;">%s</code>';
     const TEMPLATE_MESSAGE = '<code style="display: block; overflow: auto; border-top: 1px solid #eee; padding-top: 10px; padding-bottom: 10px;">%s</code>';
 
-    private $colors = array(
+    protected $colors = array(
         Token::TYPE_TYPE => '#007700',
         Token::TYPE_KEYWORD => '#0000BB',
         Token::TYPE_BRACE => '#007700',
