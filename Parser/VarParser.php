@@ -55,11 +55,21 @@ class VarParser
         return $this->tokenizers;
     }
 
+    /**
+     * Gets default max dumping deep
+     *
+     * @return int
+     */
     public function getMaxDeep()
     {
         return $this->maxDeep;
     }
 
+    /**
+     * Sets default max dumping deep
+     *
+     * @param int $maxDeep
+     */
     public function setMaxDeep($maxDeep)
     {
         $this->maxDeep = $maxDeep;
