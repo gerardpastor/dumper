@@ -115,7 +115,7 @@ You can configure some default parameters on Dumper.
 Accessing Dumper Instance
 -------------------------
 
-You can access dumper instance when call `enable()` or by calling `getInstance()` when Dumper es already enabled
+You can access dumper instance when call `enable()` or by calling `getInstance()` when Dumper is already enabled
 
 ```php
 use Deg\Dumper\Dumper;
