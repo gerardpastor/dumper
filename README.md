@@ -45,7 +45,7 @@ $vars = array(
     array(),
 );
 
-dumpVars($vars, 1);
+dumpVars($vars);
 ```
 
 `dump`: Dump $var
@@ -54,7 +54,7 @@ dumpVars($vars, 1);
 
 $var = 'foo';
 
-dump($var, 1);
+dump($var);
 ```
 
 `dumpAll`: Dump each argument
@@ -70,7 +70,7 @@ dumpAll($var1, $var2);
 All of this functions starting with "e" dumps and ends up execution.
 
 ```php
-edumpVars(array('text', 123, array()), 1);
+edumpVars(array('text', 123, array()));
 
 // Or
 edump('foo', 1);
@@ -83,10 +83,9 @@ edumpAll('foo', 'var');
 Dumping backtrace
 -----------------
 
-You can dump current debug backtrace:
+You can dump current debug backtrace with `dumpBacktrace()`:
 
 ```php
-// Dumps current debug backtrace
 // dumpBacktrace($limit = null)
 
 dumpBacktrace();
@@ -102,9 +101,6 @@ Raw var_dump
 Aditionally, Dumper provides `rawDump` funtion that does a native `var_dump` inside a `<pre>` tag.
 
 ```php
-// Dumps vars using native var_dump
-// rawDump($var, $_ = null)
-
 rawDump('foo', 'var');
 ```
 
@@ -117,12 +113,12 @@ Accessing Dumper Instance
 -------------------------
 
 To configure Dumper you must acces to its instance.
-You can access dumper instance when call `enable()` or by calling `getInstance()` when `Dumper` is already enabled.
+You can access dumper instance when call `enable()` or by calling `getInstance()` when Dumper is already enabled.
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable(Dumper::BROWSER, false);
+$dumper = Dumper::enable(Dumper::BROWSER);
 $dumper->dump('foo');
 
 $dumper = Dumper::getInstance();
@@ -315,15 +311,16 @@ $dumper = new Dumper($varParser, $backtraceParser, $backtraceFactory, $output);
 $dumper->dump('foo');
 ```
 
-If you want the global functions uses your own instance, call `setInstance()`:
+If you want the global functions uses your own instance, call `setInstance()` on `Dumper`:
 
 
 ```php
-
 // ...
 
 $dumper = new Dumper($varParser, $backtraceParser, $backtraceFactory, $output);
 
 Dumper::setInstance($dumper);
 Dumper::defineGlobalFunctions();
+
+dump('foo');
 ```
