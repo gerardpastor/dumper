@@ -3,13 +3,18 @@ Dumper
 
 Dumper is a simple and ready to use PHP dumper.
 
+Usage
+=========
+
+Install the latest version with `composer require gerardpastor/dumper`
+
 Enabling all dumping functions is as easy as calling `enable()` method on the
 main `Dumper` class:
 
 ```php
 use Deg\Dumper\Dumper;
 
-Dumper::enable('browser');
+Dumper::enable(Dumper::BROWSER);
 ```
 
 The first parameter determines what output to use.
@@ -20,22 +25,18 @@ Outputs
 
 By default, Dumper includes 3 outputs: dummy, browser and console.
 
-- **BROWSER**: Dumps variables to browser (uses HTML formatter)
-- **CONSOLE**: Dumps variables to console (uses Console formatter)
-- **DUMMY**: Dumps nothing (used for production environment)
+- **browser**: Dumps variables to browser (uses HTML formatter)
+- **console**: Dumps variables to console (uses Console formatter)
+- **dummy**: Dumps nothing (used for production environment)
 
-
-Functions
-=========
 
 Dumping vars
 ------------
 
-By default, Dumper defines 3 dumper functions:
+Dumper defines 3 dumping functions:
 
-
+`dumpVars`: Dumps each var in $vars
 ```php
-// Dumps each var in $vars
 // dumpVars(array $vars, $deep = null)
 
 $vars = array(
@@ -47,8 +48,8 @@ $vars = array(
 dumpVars($vars, 1);
 ```
 
+`dump`: Dump $var
 ```php
-// Dump $var
 // dump($var, $deep = null)
 
 $var = 'foo';
@@ -56,8 +57,8 @@ $var = 'foo';
 dump($var, 1);
 ```
 
+`dumpAll`: Dump each argument
 ```php
-// Dump each arguments
 // dumpAll($var, $_ = null)
 
 $var1 = 'foo';
@@ -98,7 +99,7 @@ edumpBacktrace();
 Raw var_dump
 -----------------
 
-Aditionally, Dumper provides `rawDump` funtion that does a native var_dump inside a `<pre>` tag.
+Aditionally, Dumper provides `rawDump` funtion that does a native `var_dump` inside a `<pre>` tag.
 
 ```php
 // Dumps vars using native var_dump
@@ -115,12 +116,13 @@ You can configure some default parameters on Dumper.
 Accessing Dumper Instance
 -------------------------
 
-You can access dumper instance when call `enable()` or by calling `getInstance()` when Dumper is already enabled
+To configure Dumper you must acces to its instance.
+You can access dumper instance when call `enable()` or by calling `getInstance()` when `Dumper` is already enabled.
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser', false);
+$dumper = Dumper::enable(Dumper::BROWSER, false);
 $dumper->dump('foo');
 
 $dumper = Dumper::getInstance();
@@ -130,12 +132,12 @@ $dumper->dump('foo');
 Set default max dumping deep
 ----------------------------
 
-You can set the default max dumping deep by calling `setDefaultMaxDeep` on a Dumper instance:
+You can set the default max dumping deep by passing to the `VarParser`:
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser');
+$dumper = Dumper::enable(Dumper::BROWSER);
 $dumper->getVarParser()->setMaxDeep(3);
 
 // Dumps at 3 levels
@@ -149,37 +151,37 @@ You can override this value in any call to `dump` or `dumpVars` as the second ar
 dump($arrayOrObject, 2);
 ```
 
-Limit the number of stack frames in backtrace
----------------------------------------------
+Limit the number of stack frames in backtrace dumping
+-----------------------------------------------------
 
-By default, Dumper dumps all stack frames in bactrace. You can limit this number globally by passing to the BacktraceFactory:
+By default, Dumper dumps all stack frames in backtrace. You can limit this number globally by passing to the `BacktraceFactory`:
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser');
+$dumper = Dumper::enable(Dumper::BROWSER);
 $dumper->getBacktraceFactory()->setMaxLimit(3);
 
-// Dumps 3 levels
+// Dumps 3 stack frames
 dumpBacktrace();
 ```
 
 You can override this value in any call to `dumpBacktrace` as the first argument:
 
 ```php
-// Dumps 2 levels
+// Dumps 2 stack frames
 dumpBacktrace(2);
 ```
 
 Add excludes to backtrace
 -------------------------
 
-Dumper exculdes all namespaces and directories from Dumper, but you can add your own by passing to the BacktraceFactory:
+Dumper exculdes all namespaces and directories from Dumper, but you can add your own by passing to the `BacktraceFactory`:
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser');
+$dumper = Dumper::enable(Dumper::BROWSER);
 $dumper->getBacktraceFactory()->addExcule('Foo/Var');
 
 //Or
@@ -190,39 +192,49 @@ $dumper->getBacktraceFactory()->addExcule(__DIRECTORY__ . '/foo/var');
 Disabling global functions
 ==========================
 
-You can disable the definition of Dumper as a global functions by passing `false` as second argument when calling `enable()`.
+You can disable the definition of Dumper as a global functions by passing `false` as the second argument when calling `enable()`.
 Then, you can still access dumper functions by calling directly on a dumper instance:
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser', false);
+$dumper = Dumper::enable(Dumper::BROWSER, false);
 
 $dumper->dump('foo');
 ```
 
+You can then enable this global functions at any time by calling `defineGlobalFunctions()`:
+
+```php
+use Deg\Dumper\Dumper;
+
+$dumper = Dumper::enable(Dumper::BROWSER, false);
+Dumper::defineGlobalFunctions();
+
+dump('foo');
+```
 
 Var Tokenizers
 ==============
 
 Dumper uses tokenizers to convert any variable into a string.
-A tokenizer receives a variable and returns a TokenStream (that is a collection of Tokens)
+A tokenizer receives a variable and returns a `TokenStream` (that is a collection of `Token`)
 
-Dumper includes most commonly used Tokenizers:
-- **ObjectTokenizer**: Parses an object
-- **ArrayTokenizer**: Parses an array
-- **StringTokenizer**: Parses an string
-- **GenericTokenizer**: Parses any variable (very simple)
+Dumper provides tokenizer to parse the most generic variable types:
+- _ObjectTokenizer_: Parses an object
+- _ArrayTokenizer_: Parses an array
+- _StringTokenizer_: Parses an string
+- _GenericTokenizer_: Parses any variable (in a very simple way)
 
 Tokenizer has an `accept($var)` and a `getConfidence()` methods.
-The parser will use the tokenizer that accepts the given var with bigger confidence.
+The parser will use the tokenizer with bigger confidence from those that accepted the given variable.
 
 
 Custom Tokenizers
 -----------------
 
-You can add more specific parsing by adding custom tokenizers.
-To do that, you must create a class that implements Tokenizer interface and pass to Dumper:
+You can add more specific or sophisticated parsing by adding custom tokenizers.
+To do that, you must create a class that implements `TokenizerInterface` and pass to the `VarParser`:
 
 ```php
 namespace Foo\Var;
@@ -233,19 +245,13 @@ use Deg\Dumper\Parser\TokenStreamBuilder;
 
 class MyCustomTokenizer implements TokenizerInterface
 {
-    /**
-     *
-     * @param mixed $var
-     * @param integer $deep
-     * @param VarParser $parser
-     * @return TokenStream
-     */
     public function tokenize($var, $deep, VarParser $parser)
     {
         $type = gettype($var);
 
         $builder = new TokenStreamBuilder();
 
+        // Build the stream using a TokenStreamBuilder
         $builder
             ->addKeyword($type)
             ->addBrace('(')
@@ -253,24 +259,16 @@ class MyCustomTokenizer implements TokenizerInterface
             ->addBrace(')')
         ;
 
+        // Tokenize must return a TokenStream
         return $builder->getStream();
     }
 
-    /**
-     *
-     * @param mixed $var
-     * @return boolean
-     */
     public function accept($var)
     {
         // Tells if this tokenizer can tokenize the given variable
         return is_number($var);
     }
 
-    /**
-     *
-     * @return int
-     */
     public function getConfidence()
     {
         // How specific is this tokenizer (bigger number means more specific)
@@ -280,16 +278,16 @@ class MyCustomTokenizer implements TokenizerInterface
 }
 ```
 
-And then, pass to Dumper:
+And then, pass to `VarParser`:
 
 ```php
 use Deg\Dumper\Dumper;
 
-$dumper = Dumper::enable('browser');
+$dumper = Dumper::enable(Dumper::BROWSER);
 $dumper->getVarParser()->addTokenizer(new Foo\Var\MyCustomTokenizer());
 ```
 
-Take a look to provided tokenizers for more specific examples.
+Take a look at provided tokenizers for more specific examples.
 
 
 Using Dumper as Object
@@ -315,4 +313,17 @@ $output = new BrowserOutput();
 $dumper = new Dumper($varParser, $backtraceParser, $backtraceFactory, $output);
 
 $dumper->dump('foo');
+```
+
+If you want the global functions uses your own instance, call `setInstance()`:
+
+
+```php
+
+// ...
+
+$dumper = new Dumper($varParser, $backtraceParser, $backtraceFactory, $output);
+
+Dumper::setInstance($dumper);
+Dumper::defineGlobalFunctions();
 ```
