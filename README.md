@@ -36,7 +36,7 @@ By default, Dumper defines 3 dumper functions:
 
 ```php
 // Dumps each var in $vars (accepts
-// dumpVars(array $vars, $deep = null, $output = null)
+// dumpVars(array $vars, $deep = null)
 
 $vars = array(
     'text',
@@ -49,7 +49,7 @@ dumpVars($vars, 1);
 
 ```php
 // Dump $var
-// dump($var, $deep = null, $output = null)
+// dump($var, $deep = null)
 
 $var = 'foo';
 
@@ -86,7 +86,7 @@ You can dump current debug backtrace:
 
 ```php
 // Dumps current debug backtrace
-// dumpBacktrace($limit = null, $output = null)
+// dumpBacktrace($limit = null)
 
 dumpBacktrace();
 
