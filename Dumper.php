@@ -364,6 +364,15 @@ class Dumper
     }
 
     /**
+     * Set singleton instance of dumper
+     * @param Dumper $dumper
+     */
+    public static function setInstance(Dumper $dumper)
+    {
+        static::$instance = $dumper;
+    }
+
+    /**
      * Get singleton instance of dumper
      * @return Dumper
      */
