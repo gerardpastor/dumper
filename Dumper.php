@@ -11,14 +11,13 @@
 
 namespace Deg\Dumper;
 
-use Deg\Dumper\Backtrace\Backtrace;
+use Deg\Dumper\Backtrace\BacktraceFactory;
 use Deg\Dumper\Parser\VarParser;
 use Deg\Dumper\Parser\BacktraceParser;
 use Deg\Dumper\Output\OutputInterface;
 use Deg\Dumper\Parser\TokenStream;
 use Deg\Dumper\Parser\Tokenizer;
 use Deg\Dumper\Parser\Tokenizer\TokenizerInterface;
-use Deg\Dumper\Formatter;
 use Deg\Dumper\Output;
 
 /**
@@ -44,7 +43,7 @@ class Dumper
 
     /**
      *
-     * @var Backtrace
+     * @var BacktraceFactory
      */
     private $backtraceFactory;
 
@@ -52,7 +51,7 @@ class Dumper
      *
      * @var OutputInterface
      */
-    private $outputs;
+    private $output;
 
     /**
      *
@@ -61,19 +60,20 @@ class Dumper
     private $endClousure;
 
     /**
+     * Contruct.
      *
-     * @var string
+     * @param VarParser $varParser
+     * @param BacktraceParser $backtraceParser
+     * @param BacktraceFactory $backtraceFactory
+     * @param OutputInterface $output
+     * @param function|null $endClousure
      */
-    private $defaultOutput;
-
-    public function __construct(VarParser $varParser, BacktraceParser $backtraceParser, Backtrace $backtraceFactory, $endClousure = null)
+    public function __construct(VarParser $varParser, BacktraceParser $backtraceParser, BacktraceFactory $backtraceFactory, OutputInterface $output, $endClousure = null)
     {
         $this->varParser = $varParser;
         $this->backtraceParser = $backtraceParser;
         $this->backtraceFactory = $backtraceFactory;
-
-        $this->outputs['dummy'] = new Output\NullOutput();
-        $this->defaultOutput = 'dummy';
+        $this->output = $output;
 
         $this->endClousure = $endClousure ? : function () {
             die();
@@ -82,35 +82,44 @@ class Dumper
 
     /**
      *
-     * @param string $key
-     * @return OutputInterface
-     * @throws \InvalidArgumentException
+     * @return VarParser
      */
-    public function getOutput($key)
-    {
-        if (!array_key_exists($key, $this->outputs)) {
-            throw new \InvalidArgumentException(sprintf('Output "%s" not exists', $key));
-        }
-
-        return $this->outputs[$key];
+    public function getVarParser() {
+        return $this->varParser;
     }
 
     /**
      *
-     * @return array|OutputInterface[]
+     * @return BacktraceParser
      */
-    public function getOutputs()
+    public function getBacktraceParse() {
+        return $this->backtraceParser;
+    }
+
+    /**
+     *
+     * @return BacktraceFactory
+     */
+    public function getBacktraceFactory() {
+        return $this->backtraceFactory;
+    }
+
+    /**
+     *
+     * @return OutputInterface
+     */
+    public function getOutput()
     {
-        return $this->outputs;
+        return $this->output;
     }
 
     /**
      *
      * @param OutputInterface $output
      */
-    public function addOutput($key, OutputInterface $output)
+    public function setOutput(OutputInterface $output)
     {
-        $this->outputs[$key] = $output;
+        $this->output = $output;
     }
 
     /**
@@ -132,6 +141,7 @@ class Dumper
     }
 
     /**
+     * Gets default max dumping deep
      *
      * @return int
      */
@@ -141,6 +151,7 @@ class Dumper
     }
 
     /**
+     * Sets default max dumping deep
      *
      * @param int $maxDeep
      */
@@ -150,12 +161,23 @@ class Dumper
     }
 
     /**
+     * Gets default max dumping limit
      *
-     * @param string $defaultOutput
+     * @return int
      */
-    public function setDefaultOutput($defaultOutput)
+    public function getDefaultMaxLimit()
     {
-        $this->defaultOutput = $defaultOutput;
+        return $this->backtraceFactory->getMaxLimit();
+    }
+
+     /**
+     * Sets default max dumping limit
+     *
+     * @param int $maxLimit
+     */
+    public function setDefaultMaxLimit($maxLimit)
+    {
+        $this->backtraceFactory->setMaxLimit($maxLimit);
     }
 
     // Shortcuts
@@ -188,16 +210,15 @@ class Dumper
      *
      * @param array  $var     Array of vars to dump
      * @param int    $deep    Deep of dumpping
-     * @param string $output  Output
      */
-    public function dumpVars(array $vars, $deep = null, $output = null)
+    public function dumpVars(array $vars, $deep = null)
     {
         $messages = array();
         foreach ($vars as $var) {
             $messages[] = $this->varParser->parse($var, $deep);
         }
 
-        $this->write($messages, $output);
+        $this->write($messages);
     }
 
     /**
@@ -205,11 +226,10 @@ class Dumper
      *
      * @param type   $var     Variable to dump
      * @param int    $deep    Deep of dumpping
-     * @param string $output  Output
      */
-    public function dump($var, $deep = null, $output = null)
+    public function dump($var, $deep = null)
     {
-        $this->dumpVars(array($var), $deep, $output);
+        $this->dumpVars(array($var), $deep);
     }
 
     /**
@@ -226,13 +246,12 @@ class Dumper
     /**
      * Dumps backtrace
      *
-     * @param int    $limit   Max traces to show
-     * @param string $output  Output
+     * @param int    $limit   Max traces to dump
      */
-    public function dumpBacktrace($limit = null, $output = null)
+    public function dumpBacktrace($limit = null)
     {
         $backtrace = $this->getBacktraceAsStream($limit);
-        $this->write($backtrace, $output);
+        $this->write($backtrace);
     }
 
     // Short hands
@@ -241,11 +260,10 @@ class Dumper
      *
      * @param array  $var     Array of vars to dump to dump
      * @param int    $deep    Deep of dumpping
-     * @param string $output  Output
      */
-    public function edumpVars(array $vars, $deep = null, $output = null)
+    public function edumpVars(array $vars, $deep = null)
     {
-        $this->dumpVars($vars, $deep, $output);
+        $this->dumpVars($vars, $deep);
         $this->end();
     }
 
@@ -254,11 +272,10 @@ class Dumper
      *
      * @param type   $var     Variable to dump
      * @param int    $deep    Deep of dumpping
-     * @param string $output  Output
      */
-    public function edump($var, $deep = null, $output = null)
+    public function edump($var, $deep = null)
     {
-        $this->dumpVars(array($var), $deep, $output);
+        $this->dumpVars(array($var), $deep);
         $this->end();
     }
 
@@ -278,11 +295,10 @@ class Dumper
      * Dumps backtrace and ends execution
      *
      * @param int    $limit   Max traces to show
-     * @param string $output  Output
      */
-    public function edumpBacktrace($limit = null, $output = null)
+    public function edumpBacktrace($limit = null)
     {
-        $this->dumpBacktrace($limit, $output);
+        $this->dumpBacktrace($limit);
         $this->end();
     }
 
@@ -293,7 +309,6 @@ class Dumper
     {
         call_user_func($this->endClousure);
     }
-
 
     /**
      * Gets backtrace as token stream
@@ -322,12 +337,10 @@ class Dumper
      * @param array       $messages Messages to output
      * @param string|null $output   Output to use
      */
-    protected function write($messages, $output = null)
+    protected function write($messages)
     {
-        $output = $output ? : $this->defaultOutput;
         $caller = $this->getCallerAsStream();
-
-        $this->getOutput($output)->write($messages, $caller);
+        $this->output->write($messages, $caller);
     }
 
     /** @var Dumper */
@@ -350,7 +363,7 @@ class Dumper
      * Get singleton instance of dumper
      * @return Dumper
      */
-    public static function enable($context, $defineGlobalFunctions = true)
+    public static function enable($output, $defineGlobalFunctions = true)
     {
         $varParser = new VarParser();
         $varParser->addTokenizer(new Tokenizer\GenericTokenizer());
@@ -361,17 +374,27 @@ class Dumper
         $backtraceParser = new BacktraceParser();
 
 
-        $backtraceFactory = new Backtrace();
+        $backtraceFactory = new BacktraceFactory();
         $backtraceFactory->addExcule(__DIR__);
         $backtraceFactory->addExcule(__NAMESPACE__);
 
-        self::$instance = new self($varParser, $backtraceParser, $backtraceFactory);
+        if (!$output instanceof OutputInterface) {
+            switch ($output) {
+                case 'browser':
+                    $output = new Output\BrowserOutput();
+                    break;
 
-        self::$instance->addOutput('browser', new Output\BrowserOutput());
-        self::$instance->addOutput('console', new Output\ConsoleOutput());
-        self::$instance->setDefaultOutput($context);
+                case 'console':
+                    $output = new Output\ConsoleOutput();
+                    break;
 
+                default:
+                    $output = new Output\NullOutput();
+                    break;
+            }
+        }
 
+        self::$instance = new self($varParser, $backtraceParser, $backtraceFactory, $output);
 
         if ($defineGlobalFunctions) {
             static::defineGlobalFunctions();
