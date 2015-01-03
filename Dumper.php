@@ -29,9 +29,9 @@ use Deg\Dumper\Output;
  */
 class Dumper
 {
-    const OUTPUT_BROWSER = 'browser';
-    const OUTPUT_CONSOLE = 'console';
-    const OUTPUT_DUMMY = 'dummy';
+    const BROWSER = 'browser';
+    const CONSOLE = 'console';
+    const DUMMY = 'dummy';
 
     /**
      *
@@ -384,11 +384,11 @@ class Dumper
 
         if (!$output instanceof OutputInterface) {
             switch (strtolower($output)) {
-                case static::OUTPUT_BROWSER:
+                case static::BROWSER:
                     $output = new Output\BrowserOutput();
                     break;
 
-                case static::OUTPUT_CONSOLE:
+                case static::CONSOLE:
                     $output = new Output\ConsoleOutput();
                     break;
 
