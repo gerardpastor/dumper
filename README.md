@@ -4,7 +4,7 @@ Dumper
 Dumper is a simple and ready to use PHP dumper.
 
 Usage
-=========
+-----
 
 Install the latest version with `composer require gerardpastor/dumper`
 
@@ -102,8 +102,8 @@ inside a `<pre>` tag.
 rawDump('foo', 'var');
 ```
 
-Configure Dumper
-================
+Configuration
+=============
 
 You can configure some default parameters on Dumper.
 
