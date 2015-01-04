@@ -1,7 +1,8 @@
 Dumper
 ======
 
-Dumper is a simple print_r() and var_dump() replacement.
+Dumper is a simple and ready to use PHP var dumper.
+Is a print_r() and var_dump() replacement.
 
 
 Usage
