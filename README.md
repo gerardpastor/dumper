@@ -2,7 +2,8 @@ Dumper
 ======
 
 Dumper is a simple and ready to use PHP var dumper.
-Is a print_r() and var_dump() replacement.
+
+Essentially, its a `print_r()` and `var_dump()` replacement.
 
 
 Usage
